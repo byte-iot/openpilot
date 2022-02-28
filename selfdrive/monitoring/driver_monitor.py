@@ -33,6 +33,7 @@ class DRIVER_MONITOR_SETTINGS():
     self._EE_THRESH21 = 0.01
     self._EE_THRESH22 = 0.35
 
+    # 0.46, 0.35
     self._HI_STD_FALLBACK_TIME = int(10  / self._DT_DMON)  # fall back to wheel touch if model is uncertain for 10s
     self._DISTRACTED_FILTER_TS = 0.25  # 0.6Hz
 

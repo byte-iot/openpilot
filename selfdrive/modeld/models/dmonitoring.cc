@@ -173,11 +173,11 @@ DMonitoringResult dmonitoring_eval_frame(DMonitoringModelState* s, void* stream_
   DMonitoringResult ret = {0};
   for (int i = 0; i < 3; ++i) {
     ret.face_orientation[i] = s->output[i];
-    ret.face_orientation_meta[i] = softplus(s->output[6 + i]);
+    ret.face_orientation_meta[i] = exp(s->output[6 + i]);
   }
   for (int i = 0; i < 2; ++i) {
     ret.face_position[i] = s->output[3 + i];
-    ret.face_position_meta[i] = softplus(s->output[9 + i]);
+    ret.face_position_meta[i] = exp(s->output[9 + i]);
   }
   for (int i = 0; i < 4; ++i) {
     ret.ready_prob[i] = s->output[39 + i];
