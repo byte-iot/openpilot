@@ -7,9 +7,13 @@
 #include <system/graphics.h>
 #include <ui/GraphicBuffer.h>
 #include <ui/PixelFormat.h>
+#undef __ANDROID_API__
+#define __ANDROID_API__ 26
+#include "android/hardware_buffer.h"
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2ext.h>
 using namespace android;
+
 
 EGLImageTexture::EGLImageTexture(const VisionBuf *buf) {
   const int bpp = 3;
@@ -23,16 +27,27 @@ EGLImageTexture::EGLImageTexture(const VisionBuf *buf) {
                              buf->stride/bpp, buf->len/buf->stride,
                              buf->width, buf->height);
 
-  // GraphicBuffer is ref counted by EGLClientBuffer(ANativeWindowBuffer), no need and not possible to release.	
-  GraphicBuffer* gb = new GraphicBuffer(buf->width, buf->height, (PixelFormat)format,
+  // API <= 25
+  // GraphicBuffer is ref counted by EGLClientBuffer(ANativeWindowBuffer), no need and not possible to release.
+  /*GraphicBuffer* gb = new GraphicBuffer(buf->width, buf->height, (PixelFormat)format,
                                         GraphicBuffer::USAGE_HW_TEXTURE, buf->stride/bpp, (private_handle_t*)private_handle, false);
+  EGLClientBuffer clientBuf = (EGLClientBuffer)gb->getNativeBuffer();*/
+
+  // API >= 26 (doesn't work)
+  AHardwareBuffer_Desc usage;
+  usage.format = (PixelFormat)format;
+  usage.height = buf->height;
+  usage.width = buf->width;
+  AHardwareBuffer* graphicBuf;
+  AHardwareBuffer_allocate(&usage, &graphicBuf);
+  EGLClientBuffer clientBuf = eglGetNativeClientBufferANDROID(graphicBuf);
 
   EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
   assert(display != EGL_NO_DISPLAY);
 
   EGLint img_attrs[] = {EGL_IMAGE_PRESERVED_KHR, EGL_TRUE, EGL_NONE};
   img_khr = eglCreateImageKHR(display, EGL_NO_CONTEXT,
-                              EGL_NATIVE_BUFFER_ANDROID, gb->getNativeBuffer(), img_attrs);
+                              EGL_NATIVE_BUFFER_ANDROID, clientBuf, img_attrs);
   assert(img_khr != EGL_NO_IMAGE_KHR);
 
   glGenTextures(1, &frame_tex);
