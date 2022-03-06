@@ -244,7 +244,8 @@ if GetOption('compile_db'):
   env.CompilationDatabase('compile_commands.json')
 
 # Setup cache dir
-cache_dir = '/data/scons_cache' if TICI else '/tmp/scons_cache'
+PREFIX = "/data/data/com.termux/files"
+cache_dir = '/data/scons_cache' if TICI else (PREFIX+'/usr/tmp/scons_cache')
 CacheDir(cache_dir)
 Clean(["."], cache_dir)
 
@@ -306,11 +307,11 @@ if arch == "Darwin":
   qt_env["FRAMEWORKS"] += [f"Qt{m}" for m in qt_modules] + ["OpenGL"]
   qt_env.AppendENVPath('PATH', os.path.join(qt_env['QTDIR'], "bin"))
 elif arch == "aarch64":
-  qt_env['QTDIR'] = "/system/comma/usr"
+  qt_env['QTDIR'] = PREFIX+"/usr"
   qt_dirs = [
-    f"/system/comma/usr/include/qt",
+    PREFIX+"/usr/include/qt",
   ]
-  qt_dirs += [f"/system/comma/usr/include/qt/Qt{m}" for m in qt_modules]
+  qt_dirs += [(PREFIX+f"/usr/include/qt/Qt{m}") for m in qt_modules]
 
   qt_libs = [f"Qt5{m}" for m in qt_modules]
   qt_libs += ['EGL', 'GLESv3', 'c++_shared']
