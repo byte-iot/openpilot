@@ -133,7 +133,7 @@ function launch {
   [ -f "$DIR/.git/index.lock" ] && rm -f $DIR/.git/index.lock
 
   # Pull time from panda
-  $DIR/selfdrive/boardd/set_time.py
+  python3 $DIR/selfdrive/boardd/set_time.py
 
   # Check to see if there's a valid overlay-based update available. Conditions
   # are as follows:
@@ -186,7 +186,7 @@ function launch {
 
   # start manager
   cd selfdrive/manager
-  ./build.py && ./manager.py
+  python3 build.py && python3 manager.py
 
   # if broken, keep on screen error
   while true; do sleep 1; done
